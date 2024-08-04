@@ -21,7 +21,7 @@ class MyAI(AI):
         # Initialize variables to store game information
         self.board = [
             [" " for _ in range(colDimension)] for _ in range(rowDimension)
-        ]  # Stores revealed cells
+        ]  # Store revealed cells
         self.unrevealed = set(
             [(i, j) for i in range(rowDimension) for j in range(colDimension)]
         )  # Unrevealed cell coordinates
@@ -36,15 +36,6 @@ class MyAI(AI):
         self.unrevealed.remove((startY, startX))
 
     def getAction(self, number: int) -> Action:
-        """
-        This function determines the next action based on the revealed information.
-
-        Args:
-            number: The number revealed in the last uncovered cell (ignored in this basic implementation).
-
-        Returns:
-            An Action object specifying the next move.
-        """
 
         # Prioritize uncovering safe cells
         for cell in self.unrevealed:
@@ -53,7 +44,7 @@ class MyAI(AI):
                 self.board[cell[0]][cell[1]] = self.get_neighbor_mines(cell)
                 return Action(AI.Action.UNCOVER, cell[0], cell[1])
 
-        # If no safe cells, randomly choose an unrevealed cell (not ideal, can be improved)
+        # If no safe cells, randomly choose an unrevealed cell (????))
         if len(self.unrevealed) > 0:
             cell = random.choice(list(self.unrevealed))
             self.unrevealed.remove(cell)
@@ -63,15 +54,9 @@ class MyAI(AI):
         return Action(AI.Action.LEAVE)
 
     def is_safe(self, cell):
-        """
-        Checks if a cell is safe based on the number of neighboring flags and revealed mines.
 
-        Args:
-            cell: A tuple representing the cell coordinates (row, col).
-
-        Returns:
-            True if the cell is safe, False otherwise.
-        """
+        # Checks if a cell is safe based on the number of neighboring flags and revealed mines.
+        
         neighbors = self.get_neighbors(cell)
         flagged_count = sum(1 for n in neighbors if n in self.flagged)
         revealed_mines = sum(
@@ -80,15 +65,9 @@ class MyAI(AI):
         return flagged_count == self.safe_neighbors.get(cell, 0) - revealed_mines
 
     def get_neighbors(self, cell):
-        """
-        Gets the coordinates of all neighboring cells within the board boundaries.
 
-        Args:
-            cell: A tuple representing the cell coordinates (row, col).
-
-        Returns:
-            A list of tuples representing neighboring cell coordinates.
-        """
+        # Gets the coordinates of all neighboring cells within the board boundaries.
+        
         row, col = cell
         neighbors = []
         for i in range(row - 1, row + 2):
@@ -102,15 +81,8 @@ class MyAI(AI):
         return neighbors
 
     def get_neighbor_mines(self, cell):
-        """
-        Counts the number of mines around a revealed cell based on the surrounding flags.
+        # Counts the number of mines around a revealed cell based on the surrounding flags.
 
-        Args:
-            cell: A tuple representing the cell coordinates (row, col).
-
-        Returns:
-            The number of mines around the cell (assuming flags are accurate).
-        """
         neighbors = self.get_neighbors(cell)
         flagged_count = sum(1 for n in neighbors if n in self.flagged)
         return flagged_count
