@@ -34,5 +34,5 @@ class AI:
 		UNFLAG = 3
 		
 	@abstractmethod
-	def getAction(self, number: int) -> "AI.Action":
+	def getAction(self, number: int) -> "Action Oject":
 		pass
