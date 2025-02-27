@@ -1,42 +1,110 @@
-**I. Minimal AI**
+# Minesweeper AI
 
-Our initial Minimal AI algorithm covers a few basic components such as board representation, state updating, safe tile detection, and action prioritization, all within one class. At this stage, the algorithm was limited to uninformed search techniques. 
+An AI-based solution for solving Minesweeper puzzles using constraint satisfaction and probabilistic reasoning.
 
-When one cell is being considered, the function *get\_neighbors* checks boundary cells (if they exist). Each revealed cell imposes constraints on its neighboring cells. The AI simply uses these local constraints to determine whether all mines around a cell have been identified, in which case it will mark it as safe, flagging the mines (*is\_safe* and *should\_flag*). The *getAction* function serves as the main driver of the search process, both updating the board as tiles are uncovered and marked as well as maintaining the priority queue for performing actions on tiles. 
+## Project Overview
 
-In terms of creative freedoms for our initial AI, we opted to use sets for tracking revealed and flagged tiles, as it allowed for quick lookups and less redundant checks. We also ensured that the neighbor function adapts to boundary conditions, so that there wouldn’t need to be separate logic for special edge and corner cases. Lastly, by utilizing the priority queue for action selection, we implicitly implemented a simple heuristic since the order that tiles are added to the queue encodes information about which tiles would be explored next. This basis would be built upon in later iterations of the AI. 
+This project implements an AI agent that can solve Minesweeper puzzles of various sizes and difficulties. The AI uses a combination of logical deduction and probabilistic reasoning to uncover safe tiles and flag mines efficiently.
 
-**I.B Minimal AI algorithm's performance:**
+## Implementation Approach
 
-| Board Size | Sample Size | Score  | Worlds Complete |
-| :---- | :---- | :---- | :---- |
-| **5x5** | 1000 | 392 | 392 |
-| **8x8** | 1000 | 0 | 0 |
-| **16x16** | 1000 | 0 | 0 |
-| **16x30** | 1000 | 0 | 0 |
-| **Total Summary** | 4000 | 392 | 392 |
+### Minimal AI (Initial Version)
 
-**II. Final AI**
+The initial Minimal AI algorithm included basic components such as:
 
-The core search process of our Final AI is still driven by a constraint propagation function (*assess* within the *Tile* class). However, the search strategy has evolved to include the *NavigationStack* class, an OrderedDict that serves as the frontier for a depth-first search of unexplored tiles, and the *operations* deque, which prioritizes actions based on inferred safety. Additionally, the *sweep* function extends local inference to the entire board. 
+- Board representation
+- State updating
+- Safe tile detection
+- Action prioritization
+- Uninformed search techniques
 
-We rewrote the board representation to instead use NumPy arrays, which allows for vectorized operations and improved performance for larger board sizes. The *Field* class builds upon this by providing the functions for board manipulation. 
+Key features of the Minimal AI:
+- Uses sets for tracking revealed and flagged tiles
+- Employs a neighbor function that adapts to boundary conditions
+- Implements a simple heuristic via priority queue for action selection
 
-A completely new addition was the *probe\_random* function, which implements some probabilistic reasoning into the decision making process that wasn’t present before. When faced with an uncertain choice, the AI makes an informed guess based on surrounding tile values in order to keep the game going. It will alternate between using logical deductions (*assess* and *sweep*) and calculated risk taking (*probe\_random)* based on the situation, which allows the AI to handle a wider range of board states. Error handling was also introduced in *getAction* to account for unexpected states. 
+**Performance of Minimal AI:**
 
-**II.B Final AI algorithm's performance:**
+| Board Size | Sample Size | Score | Worlds Complete |
+|------------|-------------|-------|-----------------|
+| 5x5        | 1000        | 392   | 392             |
+| 8x8        | 1000        | 0     | 0               |
+| 16x16      | 1000        | 0     | 0               |
+| 16x30      | 1000        | 0     | 0               |
+| Total      | 4000        | 392   | 392             |
 
-| Board Size | Sample Size | Score  | Worlds Complete |
-| :---- | :---- | :---- | :---- |
-| **5x5** | 1000 | 1000 | 1000 |
-| **8x8** | 1000 | 603 | 603 |
-| **16x16** | 1000 | 976 | 488 |
-| **16x30** | 1000 | 0 | 0 |
-| **Total Summary** | 4000 | 2579 | 2091 |
+### Final AI (Improved Version)
 
-**III. Suggestions for improving the performance of system**  
-The first technique that we considered was implementing an A\* search algorithm to guide the board exploration. For this, we could have a heuristic function that estimates the risk of uncovering a given cell, which would consider the number of surrounding revealed cells as well as the number of remaining mines on the board. This would potentially reduce the amount of random probes required. 
+The Final AI builds upon the initial version with significant improvements:
 
-We also could have utilized Bayesian networks; in this system, the state of each node would be binary (mine or no mine), and revealed numbers would be used as evidence to update the probabilities of surrounding cells containing mines. Once probabilities are propagated across the entire board, the AI would simply have to choose the cell with the lowest probability.
+- Enhanced constraint propagation (via the `assess` function in the Tile class)
+- Advanced search strategy using the NavigationStack class (OrderedDict) for depth-first exploration
+- Priority-based action selection (operations deque)
+- Board-wide inference through the `sweep` function
+- NumPy array representation for performance optimization
+- Probabilistic reasoning via the `probe_random` function
+- Improved error handling
 
-One last suggestion would be to use a Monte Carlo Tree Search, where each possible move is randomly simulated in order to estimate the probability of winning for each. Nodes would store the number of visits and win rates, which would then be used in determining the best move. This would likely be most useful during the late game, when the number of remaining mines are lower and exhaustive search becomes less practical. 
+**Performance of Final AI:**
+
+| Board Size | Sample Size | Score | Worlds Complete |
+|------------|-------------|-------|-----------------|
+| 5x5        | 1000        | 1000  | 1000            |
+| 8x8        | 1000        | 603   | 603             |
+| 16x16      | 1000        | 976   | 488             |
+| 16x30      | 1000        | 0     | 0               |
+| Total      | 4000        | 2579  | 2091            |
+
+## Future Improvements
+
+Potential enhancements to improve performance:
+
+1. **A* Search Algorithm**: Implement a heuristic function that estimates the risk of uncovering a given cell based on surrounding revealed cells and remaining mines.
+
+2. **Bayesian Networks**: Model each cell as a node with a binary state (mine or no mine). Use revealed numbers as evidence to update probabilities across the board.
+
+3. **Monte Carlo Tree Search**: Simulate random possible moves to estimate winning probabilities, particularly useful in late-game scenarios with fewer remaining mines.
+
+## Project Structure
+
+The project consists of several Python files:
+
+- `AI.py`: Abstract base class defining the AI interface
+- `MyAI.py`: Implementation of the Minesweeper AI agent
+- `World.py`: Game engine that manages the Minesweeper board
+- `Action.py`: Defines possible actions (LEAVE, UNCOVER, FLAG, UNFLAG)
+- `WorldGenerator.py`: Utility for generating random Minesweeper worlds
+- `Main.py`: Entry point for running the AI on Minesweeper worlds
+
+## Usage
+
+### Running the AI
+
+```bash
+python3 Main.py -f <world_file> [-v] [-d]
+```
+
+Or to run on multiple worlds:
+
+```bash
+python3 Main.py -f <directory_path> [-v] [-d]
+```
+
+### Options
+
+- `-f`, `-F`: Specify file or directory name
+- `-m`, `-M`: Enable ManualAI mode (human player)
+- `-r`, `-R`: Enable RandomAI mode
+- `-v`, `-V`: Enable verbose mode
+- `-d`, `-D`: Enable debug mode
+
+### Generating Test Worlds
+
+```bash
+python3 WorldGenerator.py <numFiles> <filename> <rowDimension> <colDimension> <numMines>
+```
+
+## Requirements
+
+- Python 3.x
+- NumPy (for the Final AI implementation)
